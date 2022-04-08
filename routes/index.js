@@ -11,9 +11,6 @@ var usersModel = require('../models/users')
 require('./bdd');
 
 
-// var mail;
-
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
@@ -21,48 +18,7 @@ router.get('/', function(req, res, next) {
 res.render('login', { title: 'Express' });
 });
 
-//route sign-up
-router.post('/sign-up', async function(req, res) {
-var newUsers = new usersModel({
-  username : req.body.username,
-  mail: req.body.mail,
-  password: req.body.password, 
-});
 
-var allUsers = await newUsers.save(); // sauvgarder les données dans la bdd dans la variable allUsers
-
-if (allUsers) {
-  req.session.user = {
-    username: allUsers.username,
-    id: allUsers.id
-  }
-
-} 
-
-  res.redirect('/weather');
-  });
-
-//route sign-in avec condition de redirection
-router.post('/sign-in', async function(req, res) {
-
-
-var actualUser= await usersModel.findOne({mail:req.body.email});
-
-
-
-console.log(req.session);
-
-if(actualUser == undefined){
-  res.redirect('/')
-} else {
-  req.session.mail = req.body.email;
-  req.session.username = actualUser.username
-  req.session.id = actualUser._id
-  console.log(req.session.mail);
-  console.log(req.session.username);
-  console.log(req.session.id)
-  res.redirect('/weather')}
-});
 
 
 router.get('/weather', async function(req, res, next) {
@@ -73,10 +29,6 @@ router.get('/weather', async function(req, res, next) {
   res.render('weather', {cityList, weatherModel});
 });
 
-router.get('/logout', async function(req, res) {
-  req.session.destroy();
-  res.redirect('/');
-});
 
 
 router.post('/add-city', async function(req, res) {
@@ -101,9 +53,12 @@ router.post('/add-city', async function(req, res) {
         url: "http://openweathermap.org/img/wn/"+dataAPI.weather[0].icon+".png",
         descriptif: dataAPI.weather[0].description,
         maxTemp: dataAPI.main.temp_max,
-        minTemp: dataAPI.main.temp_min
+        minTemp: dataAPI.main.temp_min,
+        lon: dataAPI.coord.lon,
+        lat: dataAPI.coord.lat
     
      });
+     console.log(cityModel.lat)
      await cityModel.save();
      cityList = await weatherModel.find();
     
@@ -135,10 +90,12 @@ router.get('/update-city', async function(req, res, next) {
         url: "http://openweathermap.org/img/wn/"+dataAPI.weather[0].icon+".png",
         descriptif: dataAPI.weather[0].description,
         maxTemp: dataAPI.main.temp_max,
-        minTemp: dataAPI.main.temp_min
+        minTemp: dataAPI.main.temp_min,
+        lon: dataAPI.coord.lon,
+        lat: dataAPI.coord.lat
       }
      );
-     console.log(cityList[i].name);
+     //console.log(cityList[i].name);
    }
  
    cityList = await weatherModel.find();

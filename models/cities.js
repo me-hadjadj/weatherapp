@@ -6,7 +6,9 @@ var mongoose = require('mongoose');
     url: String,
     descriptif: String,
     maxTemp: Number,
-    minTemp: Number
+    minTemp: Number,
+    lon: Number,
+    lat: Number
 
  });
  
