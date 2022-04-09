@@ -12,23 +12,28 @@ router.get('/', function(req, res, next) {
 
 //route sign-up
 router.post('/sign-up', async function(req, res) {
+  var actualUser= await usersModel.findOne({mail:req.body.mail});
+ 
+ console.log(actualUser);
+ if (actualUser == null) {
+  
   var newUsers = new usersModel({
     username : req.body.username,
     mail: req.body.mail,
     password: req.body.password, 
   });
-  
   var allUsers = await newUsers.save(); // sauvgarder les données dans la bdd dans la variable allUsers
+  req.session.user = {
+    username: allUsers.username,
+    id: allUsers.id
+  }
+  res.redirect('/weather');
+
+} else {
+  res.redirect('/')   
+}
   
-  if (allUsers) {
-    req.session.user = {
-      username: allUsers.username,
-      id: allUsers.id
-    }
-  
-  } 
-  
-    res.redirect('/weather');
+    
     });
   
   //route sign-in avec condition de redirection
